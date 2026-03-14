@@ -24,6 +24,14 @@ export default function CountdownSection({ countdown }) {
     ["seg", countdown.seconds],
   ];
 
+  const isWeddingDay =
+    countdown.days <= 0 &&
+    countdown.hours <= 0 &&
+    countdown.minutes <= 0 &&
+    countdown.seconds <= 0;
+
+  const floatingHearts = Array.from({ length: 12 });
+
   return (
     <section
       id="detalles"
@@ -81,6 +89,44 @@ export default function CountdownSection({ countdown }) {
             style={{ y: cardY, scale: cardScale }}
             className="relative flex h-[240px] w-[240px] items-center justify-center md:h-[310px] md:w-[310px]"
           >
+            {isWeddingDay &&
+              floatingHearts.map((_, i) => {
+                const positions = [
+                  "left-[12%] top-[8%]",
+                  "left-[4%] top-[38%]",
+                  "left-[18%] bottom-[8%]",
+                  "left-[38%] top-[-6%]",
+                  "right-[38%] top-[-8%]",
+                  "right-[14%] top-[10%]",
+                  "right-[4%] top-[38%]",
+                  "right-[18%] bottom-[8%]",
+                  "left-[50%] bottom-[-8%]",
+                  "left-[30%] bottom-[-2%]",
+                  "right-[30%] bottom-[-2%]",
+                  "left-[50%] top-[-10%]",
+                ];
+
+                return (
+                  <MotionDiv
+                    key={i}
+                    className={`absolute z-[4] ${positions[i]}`}
+                    animate={{
+                      y: [0, -10, 0],
+                      scale: [1, 1.18, 1],
+                      opacity: [0.75, 1, 0.75],
+                    }}
+                    transition={{
+                      duration: 1.8 + (i % 4) * 0.35,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: i * 0.08,
+                    }}
+                  >
+                    <FaHeart className="h-4 w-4 text-[#c9a646] md:h-5 md:w-5" />
+                  </MotionDiv>
+                );
+              })}
+
             <MotionDiv
               className="absolute inset-[-8px_-12px_-12px_-10px] border-2 border-[rgba(183,157,111,.52)]"
               style={{ borderRadius: "47% 53% 51% 49% / 52% 46% 54% 48%" }}
@@ -117,54 +163,103 @@ export default function CountdownSection({ countdown }) {
             <MotionDiv
               className="absolute inset-0 rounded-full"
               style={{
-                background:
-                  "radial-gradient(circle at 35% 28%, rgba(255,255,255,.98), rgba(245,241,234,.98) 74%)",
+                background: isWeddingDay
+                  ? "radial-gradient(circle at 35% 28%, rgba(255,255,255,1), rgba(255,246,225,.98) 72%)"
+                  : "radial-gradient(circle at 35% 28%, rgba(255,255,255,.98), rgba(245,241,234,.98) 74%)",
                 border: "1px solid rgba(185,170,143,.28)",
-                boxShadow: "0 18px 34px rgba(61,40,16,.16)",
+                boxShadow: isWeddingDay
+                  ? "0 18px 38px rgba(61,40,16,.18), 0 0 34px rgba(201,166,70,.18)"
+                  : "0 18px 34px rgba(61,40,16,.16)",
               }}
-              animate={{ scale: [1, 1.01, 1] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+              animate={
+                isWeddingDay
+                  ? { scale: [1, 1.035, 1] }
+                  : { scale: [1, 1.01, 1] }
+              }
+              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
             />
 
             <div className="relative z-[2] flex w-full flex-col items-center gap-4 px-5 md:px-7">
-              <h2 className="title-elegant text-[28px] font-semibold leading-none text-[#b79d6f] md:text-[42px]">
-                Faltan
-              </h2>
+              {!isWeddingDay ? (
+                <>
+                  <h2 className="title-elegant text-[28px] font-semibold leading-none text-[#b79d6f] md:text-[42px]">
+                    Faltan
+                  </h2>
 
-              <div className="-mt-2 h-px w-16 bg-[rgba(183,157,111,.32)] md:w-20" />
+                  <div className="-mt-2 h-px w-16 bg-[rgba(183,157,111,.32)] md:w-20" />
 
-              <div className="grid w-full grid-cols-4 gap-0">
-                {items.map(([label, value], idx) => (
-                  <div
-                    key={label}
-                    className={`flex flex-col items-center justify-center px-1 ${
-                      idx !== 0 ? "border-l border-[rgba(182,169,143,.22)]" : ""
-                    }`}
-                  >
-                    <MotionDiv
-                      key={`${label}-${value}`}
-                      initial={{ opacity: 0.55, y: 6 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.25 }}
-                    >
-                      <p className="countdown-number text-[22px] leading-none text-[#5f5a53] md:text-[40px]">
-                        {String(value).padStart(2, "0")}
-                      </p>
-                    </MotionDiv>
+                  <div className="grid w-full grid-cols-4 gap-0">
+                    {items.map(([label, value], idx) => (
+                      <div
+                        key={label}
+                        className={`flex flex-col items-center justify-center px-1 ${
+                          idx !== 0 ? "border-l border-[rgba(182,169,143,.22)]" : ""
+                        }`}
+                      >
+                        <MotionDiv
+                          key={`${label}-${value}`}
+                          initial={{ opacity: 0.55, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.25 }}
+                        >
+                          <p className="countdown-number text-[22px] leading-none text-[#5f5a53] md:text-[40px]">
+                            {String(value).padStart(2, "0")}
+                          </p>
+                        </MotionDiv>
 
-                    <p className="title-elegant mt-2 text-[10px] font-semibold lowercase tracking-[0.04em] text-[#b79d6f] md:text-[12px]">
-                      {label}
-                    </p>
+                        <p className="title-elegant mt-2 text-[10px] font-semibold lowercase tracking-[0.04em] text-[#b79d6f] md:text-[12px]">
+                          {label}
+                        </p>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
 
-              <MotionDiv
-                animate={{ scale: [1, 0.92, 1.08, 1], y: [0, 1, -1, 0] }}
-                transition={{ duration: 1.35, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <FaHeart className="h-7 w-7 text-[#b79d6f] md:h-8 md:w-8" />
-              </MotionDiv>
+                  <MotionDiv
+                    animate={{ scale: [1, 0.92, 1.08, 1], y: [0, 1, -1, 0] }}
+                    transition={{ duration: 1.35, repeat: Infinity, ease: "easeInOut" }}
+                  >
+                    <FaHeart className="h-7 w-7 text-[#b79d6f] md:h-8 md:w-8" />
+                  </MotionDiv>
+                </>
+              ) : (
+                <MotionDiv
+                  initial={{ opacity: 0, scale: 0.86, y: 16 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.7, ease: "easeOut" }}
+                  className="flex flex-col items-center -mt-4 md:-mt-6"
+                >
+                  <p className="title-elegant text-[16px] uppercase tracking-[0.25em] text-[#b79d6f] md:text-[18px]">
+                    Ha llegado el momento
+                  </p>
+
+                  <h2 className="title-script mt-1 text-center text-[34px] leading-[1.05] text-[#b79d6f] md:text-[56px]">
+                    ¡Hoy es
+                    <br />
+                    nuestro gran día!
+                  </h2>
+
+                  <div className="mt-4 h-px w-24 bg-[rgba(183,157,111,.34)]" />
+
+                  <p className="title-elegant mt-4 max-w-[220px] text-center text-[15px] italic leading-relaxed text-[#8d7761] md:max-w-[260px] md:text-[18px]">
+                    Comienza la celebración de nuestra historia juntos.
+                  </p>
+
+                  <MotionDiv
+                    className="mt-4"
+                    animate={{
+                      scale: [1, 1.18, 1],
+                      rotate: [0, -6, 6, 0],
+                    }}
+                    transition={{
+                      duration: 1.8,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <FaHeart className="h-8 w-8 text-[#c9a646] md:h-10 md:w-10" />
+                  </MotionDiv>
+                </MotionDiv>
+              )}
             </div>
           </MotionDiv>
 
@@ -178,8 +273,9 @@ export default function CountdownSection({ countdown }) {
             </div>
 
             <p className="title-elegant max-w-[700px] text-[18px] italic leading-relaxed text-[#8d7761] md:text-[26px]">
-              Cada instante nos acerca al momento en que nuestras vidas se unirán
-              para siempre.
+              {isWeddingDay
+                ? "Hoy celebramos el comienzo de una nueva etapa llena de amor, alegría y recuerdos inolvidables."
+                : "Cada instante nos acerca al momento en que nuestras vidas se unirán para siempre."}
             </p>
           </div>
         </div>
