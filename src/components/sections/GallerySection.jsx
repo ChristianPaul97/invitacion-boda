@@ -1,5 +1,5 @@
-import { motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const MotionDiv = motion.div;
@@ -18,6 +18,7 @@ function getGalleryImages() {
 export default function GallerySection() {
   const images = useMemo(() => getGalleryImages(), []);
   const [current, setCurrent] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const goPrev = () => {
     setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -26,6 +27,16 @@ export default function GallerySection() {
   const goNext = () => {
     setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
+
+  useEffect(() => {
+    if (!images.length || isHovered) return;
+
+    const interval = setInterval(() => {
+      setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    }, 3200);
+
+    return () => clearInterval(interval);
+  }, [images.length, isHovered]);
 
   if (!images.length) {
     return (
@@ -53,7 +64,6 @@ export default function GallerySection() {
 
   return (
     <section className="relative overflow-hidden bg-[#eef2ef] px-6 pb-20 pt-20 md:pb-28 md:pt-24">
-      {/* ondas decorativas */}
       <div className="pointer-events-none absolute inset-x-0 top-[-30px] h-[150px] opacity-85 md:top-[-40px] md:h-[220px]">
         <svg
           viewBox="0 0 1440 260"
@@ -86,7 +96,6 @@ export default function GallerySection() {
         </svg>
       </div>
 
-      {/* textura de fondo */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.18]">
         <div
           className="absolute inset-0"
@@ -98,7 +107,6 @@ export default function GallerySection() {
       </div>
 
       <div className="relative z-[2] mx-auto max-w-7xl">
-        {/* encabezado */}
         <div className="mb-12 text-center md:mb-16">
           <div className="mb-3 flex items-center justify-center">
             <div className="h-px w-10 bg-[rgba(183,157,111,.32)] md:w-16" />
@@ -117,46 +125,59 @@ export default function GallerySection() {
           </p>
         </div>
 
-        {/* carrusel principal */}
-        <div className="relative">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1.05fr_1fr]">
+        <div
+          className="relative"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1.08fr_1fr]">
             {[current - 1, current, current + 1].map((idx, slot) => {
               const realIndex = (idx + images.length) % images.length;
               const isCenter = slot === 1;
 
               return (
                 <MotionDiv
-                  key={`${realIndex}-${slot}`}
-                  initial={{ opacity: 0, y: 16 }}
+                  key={`${realIndex}-${slot}-${current}`}
+                  initial={{ opacity: 0, y: 20, scale: 0.94 }}
                   animate={{
-                    opacity: isCenter ? 1 : 0.88,
+                    opacity: isCenter ? 1 : 0.72,
                     y: 0,
-                    scale: isCenter ? 1 : 0.96,
+                    scale: isCenter ? 1 : 0.92,
                   }}
-                  transition={{ duration: 0.45, ease: "easeOut" }}
-                  className={`relative overflow-hidden border border-[rgba(183,157,111,.14)] bg-[rgba(255,255,255,.82)] p-3 shadow-[0_18px_42px_rgba(61,40,16,.08)] ${
+                  transition={{ duration: 0.55, ease: "easeOut" }}
+                  className={`relative overflow-hidden rounded-[24px] border border-[rgba(183,157,111,.14)] bg-[rgba(255,255,255,.82)] p-3 shadow-[0_18px_42px_rgba(61,40,16,.08)] ${
                     isCenter
-                      ? "md:translate-y-0"
+                      ? "z-[2] md:translate-y-0"
                       : "hidden md:block md:translate-y-8"
                   }`}
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-[#f8f6f2]">
+                  <MotionDiv
+                    whileHover={{ scale: isCenter ? 1.04 : 1.02 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    className={`relative overflow-hidden rounded-[18px] bg-[#f8f6f2] ${
+                      isCenter
+                        ? "aspect-[4/5] md:aspect-[4/4.8]"
+                        : "aspect-[4/5] md:aspect-[4/5.2]"
+                    }`}
+                  >
                     <img
                       src={images[realIndex]}
                       alt={`Galería ${realIndex + 1}`}
-                      className="h-full w-full object-cover transition duration-700"
+                      className="h-full w-full object-cover object-top transition duration-700 hover:scale-[1.06]"
+                      loading="lazy"
                     />
-                  </div>
+
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[rgba(47,36,28,.12)] via-transparent to-transparent opacity-70" />
+                  </MotionDiv>
                 </MotionDiv>
               );
             })}
           </div>
 
-          {/* botones */}
           <button
             type="button"
             onClick={goPrev}
-            className="absolute left-[-4px] top-1/2 z-[3] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(183,157,111,.28)] bg-[rgba(255,250,244,.94)] text-[#7c6950] shadow-[0_8px_18px_rgba(61,40,16,.06)] transition hover:scale-105 md:left-[-18px] md:h-12 md:w-12"
+            className="absolute left-[-4px] top-1/2 z-[3] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(183,157,111,.28)] bg-[rgba(255,250,244,.94)] text-[#7c6950] shadow-[0_8px_18px_rgba(61,40,16,.06)] transition hover:scale-110 md:left-[-18px] md:h-12 md:w-12"
             aria-label="Foto anterior"
           >
             <FaChevronLeft className="h-4 w-4" />
@@ -165,14 +186,13 @@ export default function GallerySection() {
           <button
             type="button"
             onClick={goNext}
-            className="absolute right-[-4px] top-1/2 z-[3] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(183,157,111,.28)] bg-[rgba(255,250,244,.94)] text-[#7c6950] shadow-[0_8px_18px_rgba(61,40,16,.06)] transition hover:scale-105 md:right-[-18px] md:h-12 md:w-12"
+            className="absolute right-[-4px] top-1/2 z-[3] flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[rgba(183,157,111,.28)] bg-[rgba(255,250,244,.94)] text-[#7c6950] shadow-[0_8px_18px_rgba(61,40,16,.06)] transition hover:scale-110 md:right-[-18px] md:h-12 md:w-12"
             aria-label="Foto siguiente"
           >
             <FaChevronRight className="h-4 w-4" />
           </button>
         </div>
 
-        {/* indicadores */}
         <div className="mt-8 flex items-center justify-center gap-3">
           {images.map((_, index) => (
             <button
@@ -182,7 +202,7 @@ export default function GallerySection() {
               className={`h-2.5 rounded-full transition-all duration-300 ${
                 index === current
                   ? "w-8 bg-[#b79d6f]"
-                  : "w-2.5 bg-[rgba(183,157,111,.28)]"
+                  : "w-2.5 bg-[rgba(183,157,111,.28)] hover:bg-[rgba(183,157,111,.5)]"
               }`}
               aria-label={`Ir a la foto ${index + 1}`}
             />

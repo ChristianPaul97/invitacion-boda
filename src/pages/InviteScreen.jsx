@@ -5,6 +5,7 @@ import CelebrationTimelineSection from "../components/sections/CelebrationTimeli
 import GallerySection from "../components/sections/GallerySection";
 import RsvpSection from "../components/sections/RsvpSection";
 import SpecialDetailsSection from "../components/sections/SpecialDetailsSection";
+import ThankYouSection from "../components/sections/ThankYouSection";
 import useCountdown from "../hooks/useCountdown";
 import useWeddingConfig from "../hooks/useWeddingConfig";
 import { getItineraryCards } from "../data/itinerary";
@@ -39,6 +40,7 @@ export default function InviteScreen({ guestName }) {
         <CelebrationTimelineSection items={celebrationTimeline} />
         <RsvpSection />
         <SpecialDetailsSection />
+        <ThankYouSection />
         <GallerySection />
       </div>
     </main>

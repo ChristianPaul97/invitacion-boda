@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-
-const MUSIC_URL = "/music/Brillas.mp3";
+import musica from "../assets/music/Magia.mp3";
 
 export default function useAudioPlayer() {
   const audioRef = useRef(null);
   const [musicOn, setMusicOn] = useState(false);
 
   const playMusic = async () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current) return false;
 
     try {
       audioRef.current.currentTime = 0;
       await audioRef.current.play();
       setMusicOn(true);
-    } catch {
+      return true;
+    } catch (error) {
+      console.error("Error al reproducir audio:", error);
       setMusicOn(false);
+      return false;
     }
   };
 
@@ -35,7 +37,8 @@ export default function useAudioPlayer() {
     try {
       await audioRef.current.play();
       setMusicOn(true);
-    } catch {
+    } catch (error) {
+      console.error("Error al alternar audio:", error);
       setMusicOn(false);
     }
   };
@@ -55,6 +58,6 @@ export default function useAudioPlayer() {
     playMusic,
     pauseMusic,
     toggleMusic,
-    musicUrl: MUSIC_URL,
+    musicUrl: musica,
   };
 }
