@@ -19,6 +19,7 @@ export default function GallerySection() {
   const images = useMemo(() => getGalleryImages(), []);
   const [current, setCurrent] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const goPrev = () => {
     setCurrent((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -29,14 +30,27 @@ export default function GallerySection() {
   };
 
   useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkIfMobile();
+    window.addEventListener("resize", checkIfMobile);
+
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
+
+  useEffect(() => {
     if (!images.length || isHovered) return;
+
+    const autoSlideTime = isMobile ? 30000 : 3200;
 
     const interval = setInterval(() => {
       setCurrent((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-    }, 3200);
+    }, autoSlideTime);
 
     return () => clearInterval(interval);
-  }, [images.length, isHovered]);
+  }, [images.length, isHovered, isMobile]);
 
   if (!images.length) {
     return (
